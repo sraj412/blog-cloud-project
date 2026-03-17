@@ -13,7 +13,7 @@ export default function CreatePost() {
     e.preventDefault();
     setError('');
     try {
-      const { data } = await createPost({
+      await createPost({
         title,
         content,
         ...(coverImageUrl && { coverImageUrl }),

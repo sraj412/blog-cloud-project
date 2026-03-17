@@ -8,6 +8,7 @@ import MyPosts from './pages/MyPosts';
 import EditPost from './pages/EditPost';
 import Layout from './components/Layout';
 
+// eslint-disable-next-line react/prop-types -- children is standard React prop
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
   if (!token) {
