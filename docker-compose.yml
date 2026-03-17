@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: blog-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: bloguser
+      POSTGRES_PASSWORD: blogpass
+      POSTGRES_DB: blogdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: blog-backend
+    restart: always
+    ports:
+      - "3579:3000"
+    depends_on:
+      - postgres
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: bloguser
+      DB_PASSWORD: blogpass
+      DB_NAME: blogdb
+      JWT_SECRET: supersecret
+      JWT_EXPIRES_IN: 1d
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:3579
+    container_name: blog-frontend
+    restart: always
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:
