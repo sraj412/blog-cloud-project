@@ -13,7 +13,7 @@ import { JwtStrategy } from '../../common/strategies/jwt.strategy';
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService): Promise<JwtModuleOptions> => ({
+      useFactory: (configService: ConfigService): JwtModuleOptions => ({
         secret: configService.get<string>('jwt.secret') || 'supersecret',
         signOptions: {
           // ms package format: '1d', '7d', etc.

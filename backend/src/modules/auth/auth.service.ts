@@ -17,7 +17,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<{ user: Partial<User>; access_token: string }> {
+  async register(
+    registerDto: RegisterDto,
+  ): Promise<{ user: Partial<User>; access_token: string }> {
     const existing = await this.usersService.findByEmail(registerDto.email);
     if (existing) {
       throw new ConflictException('Email already registered');
@@ -29,7 +31,8 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const { password: _, ...result } = user;
+    const { password: _pw, ...result } = user;
+    void _pw;
     const access_token = this.jwtService.sign({
       sub: user.id,
       email: user.email,
@@ -38,7 +41,9 @@ export class AuthService {
     return { user: result, access_token };
   }
 
-  async login(loginDto: LoginDto): Promise<{ user: Partial<User>; access_token: string }> {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ user: Partial<User>; access_token: string }> {
     const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -49,7 +54,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const { password: _, ...result } = user;
+    const { password: _pw, ...result } = user;
+    void _pw;
     const access_token = this.jwtService.sign({
       sub: user.id,
       email: user.email,

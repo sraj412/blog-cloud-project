@@ -101,10 +101,7 @@ export class PostsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Post not found' })
-  async publish(
-    @Param('id') id: string,
-    @CurrentUser('sub') userId: string,
-  ) {
+  async publish(@Param('id') id: string, @CurrentUser('sub') userId: string) {
     return this.postsService.publish(id, userId);
   }
 
@@ -116,10 +113,7 @@ export class PostsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Post not found' })
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser('sub') userId: string,
-  ) {
+  async remove(@Param('id') id: string, @CurrentUser('sub') userId: string) {
     await this.postsService.remove(id, userId);
   }
 }

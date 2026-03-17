@@ -1,12 +1,24 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
+import { User } from '../../modules/users/entities/user.entity';
+
+/** JWT payload shape attached to request.user by JwtStrategy */
+type JwtUser = { sub: string; email: string };
+type RequestUser = User | JwtUser;
+type CurrentUserKey = keyof User | keyof JwtUser;
 
 export const CurrentUser = createParamDecorator(
-  (data: string | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
+  (
+    data: CurrentUserKey | undefined,
+    ctx: ExecutionContext,
+  ): RequestUser | RequestUser[keyof RequestUser] | undefined => {
+    const request = ctx
+      .switchToHttp()
+      .getRequest<Request & { user?: RequestUser }>();
     const user = request.user;
 
-    if (data) {
-      return user?.[data];
+    if (data && user) {
+      return user[data] as RequestUser[keyof RequestUser] | undefined;
     }
 
     return user;

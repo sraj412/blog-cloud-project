@@ -27,7 +27,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Blog API')
-    .setDescription('A minimal blogging API for learning Docker, CI/CD, and AWS')
+    .setDescription(
+      'A minimal blogging API for learning Docker, CI/CD, and AWS',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -38,4 +40,4 @@ async function bootstrap() {
   const port = configService.get<number>('port') ?? 8500;
   await app.listen(port, '0.0.0.0');
 }
-bootstrap();
+void bootstrap();
