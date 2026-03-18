@@ -36,7 +36,8 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: http://localhost:3579
+        # Set VITE_API_URL in .env for production (e.g. http://YOUR_EC2_IP:3579)
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3579}
     container_name: blog-frontend
     restart: always
     ports:

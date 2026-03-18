@@ -1,6 +1,6 @@
 # Blog Cloud Project
 
-A minimal full-stack blogging application designed for learning Docker, CI/CD, and AWS deployment. The application features a clean architecture with environment configuration and scalability readiness.
+A minimal full-stack blogging application designed for learning Docker, CI/CD, and AWS deployment. The application features a clean architecture with environment configuration and scalability readiness of this project.
 
 ## Stack
 
