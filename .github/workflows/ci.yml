@@ -104,6 +104,9 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd blog-cloud-project
-            git pull origin main
-            docker compose up -d --build
+            cd ~/blog-cloud-project
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose build --no-cache
+            docker compose up -d
+            echo "Deploy complete. Latest commit: $(git log -1 --oneline)"
