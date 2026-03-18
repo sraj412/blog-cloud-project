@@ -51,7 +51,7 @@ export default function Login() {
         </button>
       </form>
       <p>
-        Don&apos;t have an account? <Link to="/register">Register</Link>
+        You Don&apos;t have an account? <Link to="/register">Register</Link>
       </p>
     </div>
   );
