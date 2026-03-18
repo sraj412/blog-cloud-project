@@ -85,6 +85,18 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
+      - name: Check deploy secrets
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ]; then
+            echo "::error::EC2_HOST secret is missing. Add it in Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          if [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
+            echo "::error::EC2_SSH_KEY secret is missing. Add it in Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          echo "Secrets configured"
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
