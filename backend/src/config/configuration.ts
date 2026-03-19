@@ -11,4 +11,10 @@ export default () => ({
     secret: process.env.JWT_SECRET || 'supersecret',
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
   },
+  s3: {
+    region: process.env.AWS_REGION || 'us-east-1',
+    bucket: process.env.S3_BUCKET || '',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+  },
 });

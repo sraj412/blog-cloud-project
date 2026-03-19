@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMyPost, updatePost } from '../api/posts';
+import { uploadCoverImage } from '../api/upload';
 
 export default function EditPost() {
   const { id } = useParams();
@@ -8,7 +9,10 @@ export default function EditPost() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [coverFile, setCoverFile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -18,7 +22,7 @@ export default function EditPost() {
         setContent(data.content);
         setCoverImageUrl(data.coverImageUrl || '');
       })
-      .catch((err) => setError(err.response?.data?.message || 'Failed to load post'))
+      .catch((err) => setLoadError(err.response?.data?.message || 'Failed to load post'))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -26,23 +30,31 @@ export default function EditPost() {
     e.preventDefault();
     setError('');
     try {
+      let finalCoverUrl = coverImageUrl;
+      if (coverFile) {
+        setUploading(true);
+        const { data } = await uploadCoverImage(coverFile);
+        finalCoverUrl = data.url;
+        setUploading(false);
+      }
       await updatePost(id, {
         title,
         content,
-        ...(coverImageUrl && { coverImageUrl }),
+        ...(finalCoverUrl && { coverImageUrl: finalCoverUrl }),
       });
       navigate('/my-posts');
     } catch (err) {
+      setUploading(false);
       setError(
         err.response?.data?.message ||
-        err.response?.data?.message?.[0] ||
-        'Failed to update post'
+          err.response?.data?.message?.[0] ||
+          'Failed to update post'
       );
     }
   };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
+  if (loadError) return <p style={{ color: 'red' }}>{loadError}</p>;
 
   return (
     <div style={{ maxWidth: 600, margin: '40px auto', padding: 20 }}>
@@ -70,16 +82,36 @@ export default function EditPost() {
           />
         </div>
         <div style={{ marginBottom: 10 }}>
-          <label>Cover Image URL (optional)</label>
+          <label>Cover Image (optional)</label>
           <input
-            type="url"
-            value={coverImageUrl}
-            onChange={(e) => setCoverImageUrl(e.target.value)}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={(e) => {
+              setCoverFile(e.target.files?.[0] || null);
+              setCoverImageUrl('');
+            }}
             style={{ width: '100%', padding: 8, display: 'block' }}
           />
+          <p style={{ fontSize: 12, color: '#666', marginTop: 4 }}>
+            Or paste URL:{' '}
+            <input
+              type="url"
+              value={coverImageUrl}
+              onChange={(e) => {
+                setCoverImageUrl(e.target.value);
+                setCoverFile(null);
+              }}
+              placeholder="https://..."
+              style={{ width: '100%', padding: 6, marginTop: 4 }}
+            />
+          </p>
         </div>
-        <button type="submit" style={{ padding: '8px 16px' }}>
-          Save
+        <button
+          type="submit"
+          style={{ padding: '8px 16px' }}
+          disabled={uploading}
+        >
+          {uploading ? 'Uploading...' : 'Save'}
         </button>
       </form>
     </div>

@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { HealthModule } from './modules/health/health.module';
+import { UploadModule } from './modules/upload/upload.module';
 import { User } from './modules/users/entities/user.entity';
 import { Post } from './modules/posts/entities/post.entity';
 
@@ -33,6 +34,7 @@ import { Post } from './modules/posts/entities/post.entity';
     UsersModule,
     PostsModule,
     HealthModule,
+    UploadModule,
   ],
 })
 export class AppModule {}
