@@ -1,6 +1,24 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8500';
+/**
+ * API base URL:
+ * - Prefer VITE_API_URL when set (build-time).
+ * - Else derive from current host + backend port 3579 so EC2/prod works without rebuilding
+ *   (avoids frontend calling localhost while the page is served from the server IP).
+ */
+function getApiBase() {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && String(envUrl).trim()) {
+    return String(envUrl).trim();
+  }
+  if (typeof window !== 'undefined') {
+    const { protocol, hostname } = window.location;
+    return `${protocol}//${hostname}:3579`;
+  }
+  return 'http://localhost:3579';
+}
+
+const API_BASE = getApiBase();
 
 const axiosInstance = axios.create({
   baseURL: API_BASE,

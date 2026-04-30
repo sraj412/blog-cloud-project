@@ -17,9 +17,8 @@ export class UploadService {
     const bucket = this.configService.get<string>('s3.bucket');
     const region = this.configService.get<string>('s3.region');
     const accessKeyId = this.configService.get<string>('s3.accessKeyId');
-    const secretAccessKey = this.configService.get<string>(
-      's3.secretAccessKey',
-    );
+    const secretAccessKey =
+      this.configService.get<string>('s3.secretAccessKey');
 
     if (bucket && region && accessKeyId && secretAccessKey) {
       this.bucket = bucket;
@@ -44,7 +43,9 @@ export class UploadService {
     userId: string,
   ): Promise<string> {
     if (!this.s3Client) {
-      throw new Error('S3 is not configured. Set AWS_REGION, S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY.');
+      throw new Error(
+        'S3 is not configured. Set AWS_REGION, S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY.',
+      );
     }
 
     const key = `covers/${userId}/${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
