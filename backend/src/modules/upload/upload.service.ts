@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   S3Client,
@@ -8,6 +8,7 @@ import {
 
 @Injectable()
 export class UploadService {
+  private readonly logger = new Logger(UploadService.name);
   private s3Client: S3Client | null = null;
   private bucket: string = '';
   private region: string = '';
@@ -50,14 +51,39 @@ export class UploadService {
 
     const key = `covers/${userId}/${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
 
-    await this.s3Client.send(
-      new PutObjectCommand({
-        Bucket: this.bucket,
-        Key: key,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      }),
-    );
+    if (!file.buffer?.length) {
+      throw new HttpException(
+        'Upload failed to parse file (empty buffer). Ensure the client sends multipart/form-data with a boundary.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    try {
+      await this.s3Client.send(
+        new PutObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        }),
+      );
+    } catch (err) {
+      this.logger.error(`S3 PutObject failed: ${String(err)}`);
+      const code =
+        err && typeof err === 'object' && 'Code' in err
+          ? String((err as { Code: string }).Code)
+          : '';
+      const name =
+        err && typeof err === 'object' && 'name' in err
+          ? String((err as { name: string }).name)
+          : '';
+      const msg = err instanceof Error ? err.message : 'Unknown S3 error';
+      const detail = [code, name, msg].filter(Boolean).join(' — ');
+      throw new HttpException(
+        `S3 upload failed: ${detail}. Check IAM (s3:PutObject), bucket name, region, and bucket policy.`,
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
 
     return `${this.publicUrl}/${key}`;
   }
